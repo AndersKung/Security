@@ -41,12 +41,19 @@ namespace Microsoft.AspNetCore.Authentication.OAuth
         /// </summary>
         /// <returns>A new instance of the events instance.</returns>
         protected override Task<object> CreateEventsAsync() => Task.FromResult<object>(new OAuthEvents());
+        
+        protected virtual Task<string> GetStateAsync()
+        {
+            string state = Request.Query["state"];
+            return Task.FromResult(state);
+        }
 
         protected override async Task<HandleRequestResult> HandleRemoteAuthenticateAsync()
         {
             var query = Request.Query;
-
-            var state = query["state"];
+            
+            string state= await GetStateAsync();
+            //var state = query["state"];
             var properties = Options.StateDataFormat.Unprotect(state);
 
             if (properties == null)
